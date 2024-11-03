@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../static/styles.css" />
+    <title>Grades</title>
+</head>
+
+<body>
+    <header class="navbar">
+        <a href="/"><img id="icon" src="../static/images/ucm-logo.png"></a>
+        <nav>
+            <a href="/login"> Log in </a>
+            <a href="/register"> Sign Up </a>
+        </nav>
+        <!-- <nav>
+            {% if current_user.is_authenticated %}
+            <a href="#">Classes</a>
+            <a href="#">Register</a>
+            {% else %}
+            <a href="/login">Log In</a>
+            <a href="/register">Sign Up</a>
+            {% endif %}
+        </nav> -->
+    </header>
+
+    <div id="LogIn">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {{ message }}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <h1 class="heading">Log In</h1>
+        <form method="post">
+            <div id="username">
+                <label for="username"> Username </label> <br />
+                <div class="entry">
+                    <input type="text" name="username" required />
+                    <img class="icon" src="../static/images/user.png" />
+                </div>
+            </div>
+            <div id="password">
+                <label for="password"> Password </label> <br />
+                <div class="entry">
+                    <input type="text" name="password" required />
+                    <img class="icon" src="../static/images/password.png" />
+                </div>
+            </div>
+            <input type="submit" value="Log In" />
+        </form>
+    </div>
+
+    <script src="../static/index.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/styles.css">
+    <title> Grades </title>
+    <style>
+        body {
+            background-image: url(../static/images/merced-background.jpg);
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+
+<body>
+    <header class="navbar">
+        <a href="/"><img id="icon" src="../static/images/ucm-logo.png"></a>
+        <nav>
+            {% if current_user.is_authenticated %}
+            <a href="/classes">Classes</a>
+            <a href="/logout">Logout</a>
+            {% else %}
+            <a href="/login">Log In</a>
+            <a href="/register">Sign Up</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <div id="homePrompt">
+        <p id="homeMessage"> Welcome to the University of California, Merced Portal </p>
+
+        {% if current_user.is_authenticated %}
+        <p id="messageIn"> You are currently <span>logged in</span></p>
+        {% else %}
+        <p id="messageOut"> You are currently <span>logged out</span></p>
+        {% endif %}
+    </div>
+
+    <script src="../static/index.js"></script>
+</body>
+
+</html>

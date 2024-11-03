@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../static/styles.css" />
+    <title>Grades</title>
+</head>
+
+<body>
+    <header class="navbar">
+        <a href="/"><img id="icon" src="../static/images/ucm-logo.png"></a>
+        <nav>
+            <a href="/classes" id="classes">Classes</a>
+            <a href="/addClasses">Add Classes</a>
+            <a href="/logout">Logout</a>
+        </nav>
+    </header>
+
+    <div id="homePrompt">
+        <div id="tableDiv">
+            <table>
+                <tr>
+                    <th> Course Name </th>
+                    <th> Teacher </th>
+                    <th> Time </th>
+                    <th> Students Enrolled </th>
+                    <th> Add Class </th>
+                </tr>
+                <tr>
+                    <td> CSE 108 </td>
+                    <td> Ammon Hepworth </td>
+                    <td> TR 11:00-11:50 AM </td>
+                    <td> 4/10 </td>
+                    <!-- Add rendering condition if capacity is not full and since the onclick function will have to be to add or drop -->
+                    {% if "CSE 108" in current_user.classes %}
+                    <td> <img class="classIcon" src="../static/images/drop-class.png" course-name="CSE 108" onclick="dropClass(this)"> </td>
+                    {% else %}
+                    <td> <img class="classIcon" src="../static/images/add-class.png" course-name="CSE 108" onclick="addClass(this)"> </td>
+                    {% endif %}
+
+
+                </tr>
+                <tr>
+                    <td> Physics 121 </td>
+                    <td> Susan Walker </td>
+                    <td> MWF 2:00-2:50 PM </td>
+                    <td> 5/10 </td>
+                    {% if "Physics 121" in current_user.classes %}
+                    <td> <img class="classIcon" src="../static/images/drop-class.png" course-name="Physics 121" onclick="dropClass(this)"> </td>
+                    {% else %}
+                    <td> <img class="classIcon" src="../static/images/add-class.png" course-name="Physics 121" onclick="addClass(this)"> </td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <td> Math 131 </td>
+                    <td> Juan Meza </td>
+                    <td> TR 1:30-2:45 PM </td>
+                    <td> 1/10 </td>
+                    {% if "Math 131" in current_user.classes %}
+                    <td> <img class="classIcon" src="../static/images/drop-class.png" course-name="Math 131" onclick="dropClass(this)"> </td>
+                    {% else %}
+                    <td> <img class="classIcon" src="../static/images/add-class.png" course-name="Math 131" onclick="addClass(this)"> </td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <td> CSE 162 </td>
+                    <td> Hua Hang </td>
+                    <td> MWF 10:00-10:50 AM</td>
+                    <td> 1/10 </td>
+                    {% if "CSE 162" in current_user.classes %}
+                    <td> <img class="classIcon" src="../static/images/drop-class.png" course-name="CSE 162" onclick="dropClass(this)"> </td>
+                    {% else %}
+                    <td> <img class="classIcon" src="../static/images/add-class.png" course-name="CSE 162" onclick="addClass(this)"> </td>
+                    {% endif %}
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script src="../static/index.js"></script>
+</body>
+
+</html>

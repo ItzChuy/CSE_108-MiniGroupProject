@@ -1,0 +1,193 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
+
+body {
+    margin: 0px;
+    padding: 0px;
+    font-family: "Poppins", sans-serif;
+    background-color: white;
+}
+
+#icon {
+    height: 65px;
+    padding: 10px;
+    padding-left: 30px;
+    cursor: pointer;
+}
+
+header {
+    background-color: black;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    width: 100%;
+}
+
+nav {
+    padding-right: 30px;
+    display: flex;
+    justify-content: space-between;
+}
+
+nav a {
+    text-decoration: none;
+    font-size: 22px;
+    padding-right: 10px;
+    color: white;
+}
+
+nav a:hover {
+    color: #6082B6	;
+}
+
+#LogIn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    /* padding-top: 100px; */
+    height: 100vh;
+    /* background-color: aqua; */
+}
+
+#LogIn label {
+    font-size: 18px;
+}
+
+/* Only applies to the text and password input types */
+#LogIn input[type="text"] {
+    width: 100%; 
+    padding: 8px; 
+    letter-spacing: 0.9px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    font-size: 16px; 
+    border-radius: 5px; 
+    border: none;
+}
+
+#LogIn input[type="submit"] {
+    font-size: 15px;
+    border-radius: 25px;
+    border: none;
+    background-color: white;
+    padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-top: 15px;
+    width: 100px;
+    transition: 0.5s;
+}
+
+#LogIn input[type="submit"]:hover {
+    letter-spacing: 2px;
+    box-shadow: 0 0 30px none;
+}
+
+#LogIn form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #D3D3D3	;
+    /* background-color: violet; */
+    padding: 50px;
+    border-radius: 25px;
+    width: 250px;
+    /* height: 400px; */
+    max-width: 80%;
+}
+
+.icon {
+    height: 25px;
+    padding-bottom: 12px;
+    padding-left: 5px;
+}
+
+.entry {
+    /* background-color: aqua; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.heading {
+    text-align: center;
+    font-size: 35px;
+}
+
+#homePrompt {
+    display: flex;
+    /* padding-top: 100px; */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 30px;
+    /* color: white; */
+    /* background-color: blue; */
+}
+
+#homeMessage {
+    font-size: 45px;
+}
+
+#messageIn {
+    font-size: 25px;
+}
+
+#messageIn span {
+    color: green;
+}
+
+#messageOut {
+    font-size: 25px;
+}
+
+#messageOut span {
+    color: red;
+}
+
+#classes:active {
+    color:#6082B6;
+}
+
+.tables {
+    background-color: #6082b6bd;
+    border-radius: 25px;
+    padding: 50px;
+}
+
+.tables table {
+    /* background-color: aqua; */
+    font-size: 20px;
+    border-collapse: collapse;
+}
+
+.tables th, td {
+    padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    text-align: center;
+}
+
+.tables td {
+    border: 2px solid black;
+}
+
+.tables th {
+    font-size: 25px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.classIcon {
+    width: 50px;
+    padding-top: 5px;
+    /* transition: 0.5s; */
+}
+
+.classIcon:hover {
+    /* width: 60px; */
+    cursor: pointer;
+}
