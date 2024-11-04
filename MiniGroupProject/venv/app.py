@@ -112,8 +112,8 @@ def register():
             return redirect(url_for("register"))
         else:
             password = request.form.get("password")
-            # user = Users(username=request.form.get("username"), password=generate_password_hash(password))
-            user = Users(username=request.form.get("username"), password=password)
+            hashed_password = generate_password_hash(password)
+            user = Users(username=request.form.get("username"), password=hashed_password)
             db.session.add(user)
             db.session.commit()
 
@@ -128,33 +128,33 @@ def register():
 def login():
     # If a post request was made, find the user by filtering for the username
     if request.method == "POST":
-        user = Users.query.filter_by(username=request.form.get("username")).first()
-
-        if not user:
-            flash('User does not exist', category='error')
-
-        # Check if the password entered is the same as the user's password
-        elif user.password == request.form.get("password"):
-            # Use the login_user method to log in the user
-            login_user(user)
-            # Redirect the user back to the home
-            flash('Log in successfull')
-            return redirect(url_for("classes"))
-        else:
-            flash('Incorrect password', category='error')
-        
         # user = Users.query.filter_by(username=request.form.get("username")).first()
-        # entered_password = request.form.get("password")
-        # if user and user.password == check_password_hash(user.password, entered_password):
+
+        # if not user:
+        #     flash('User does not exist', category='error')
+
+        # # Check if the password entered is the same as the user's password
+        # elif user.password == request.form.get("password"):
         #     # Use the login_user method to log in the user
         #     login_user(user)
         #     # Redirect the user back to the home
         #     flash('Log in successfull')
-        #     return redirect(url_for("home"))
-        # elif not user:
-        #     flash('User does not exist', category='error')
+        #     return redirect(url_for("classes"))
         # else:
         #     flash('Incorrect password', category='error')
+        
+        user = Users.query.filter_by(username=request.form.get("username")).first()
+        entered_password = request.form.get("password")
+        if user and check_password_hash(user.password, entered_password):
+            # Use the login_user method to log in the user
+            login_user(user)
+            # Redirect the user back to the home
+            flash('Log in successfull')
+            return redirect(url_for("home"))
+        elif not user:
+            flash('User does not exist', category='error')
+        else:
+            flash('Incorrect password', category='error')
 
     # return render_template("loginTUT.html")
     return render_template("login.html")
