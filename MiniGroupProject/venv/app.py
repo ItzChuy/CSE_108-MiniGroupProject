@@ -29,6 +29,7 @@ class Users(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
+    Teacher = db.Column(db.Boolean, nullable=False, default=False)
     classes = db.Column(MutableList.as_mutable(db.JSON), default=[]) # list of the class ["CSE 108", "CSE 162"]
     class_time = db.Column(MutableDict.as_mutable(db.JSON), default={}) # dict that stores the class times, class_time["CSE 108"] = MWF 10:00-11:15 AM
     class_professor = db.Column(MutableDict.as_mutable(db.JSON), default={})
@@ -110,6 +111,14 @@ def register():
         if username_in_use:
             flash('Username is already in use!', category='error')
             return redirect(url_for("register"))
+        
+        elif request.form.get("role") == "True":
+            password = request.form.get("password")
+            hashed_password = generate_password_hash(password)
+            user = Users(username=request.form.get("username"), password=hashed_password, Teacher=True)
+            db.session.add(user)
+            db.session.commit()
+
         else:
             password = request.form.get("password")
             hashed_password = generate_password_hash(password)
