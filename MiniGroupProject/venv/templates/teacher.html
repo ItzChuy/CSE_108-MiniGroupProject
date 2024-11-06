@@ -1,21 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../static/styles.css" />
-    <title>Grades</title>
+    <title>Teacher Portal</title>
 </head>
 
 <body>
     <header class="navbar">
         <a href="/"><img id="icon" src="../static/images/ucm-logo.png"></a>
         <nav>
-            <!-- return false so that the page doesn't reload (interferes with table updates) -->
-            <a href="#" id="classes" onclick="showTable('user_classes'); return false;">Manage Classes</a>
-            <!-- <a href="#" id="add_classes" onclick="showTable('courses_table'); return false;">Add Classes</a> -->
+            <a href="#" id="classes" onclick="showTable('user_classes'); return false;">Classes</a>
             <a href="/logout">Logout</a>
         </nav>
     </header>
@@ -30,7 +27,7 @@
                     <th> Students Enrolled </th>
                 </tr>
                 <tr>
-                    <td> <a href="#" onclick="showTable('courses_table'); return false;">CSE 108 </td></a>
+                    <td><a href="#" onclick="showTable('courses_table'); return false;">CSE 108</a></td>
                     <td> Ammon Hepworth </td>
                     <td> TR 11:00-11:50 AM </td>
                     <td> 5/10 </td>
@@ -39,6 +36,7 @@
         </div>
 
         <div id="courses_table" class="tables">
+            <h3>Class: CSE 108</h3>
             <table>
                 <tr>
                     <th> Student Name </th>
@@ -48,8 +46,8 @@
                     <td> John Smith </td>
                     <td> 75 </td>
                 </tr>
-
             </table>
+
         </div>
     </div>
 
