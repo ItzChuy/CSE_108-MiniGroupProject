@@ -31,8 +31,12 @@ class Users(UserMixin, db.Model):
     username = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     teacher = db.Column(db.Boolean, nullable=False, default=False)
-    classes = db.Column(MutableList.as_mutable(db.JSON), default=[]) # list of the class ["CSE 108", "CSE 162"]
-    class_time = db.Column(MutableDict.as_mutable(db.JSON), default={}) # dict that stores the class times, class_time["CSE 108"] = MWF 10:00-11:15 AM
+    classes = db.Column(
+        MutableList.as_mutable(db.JSON), default=[]
+    )  # list of the class ["CSE 108", "CSE 162"]
+    class_time = db.Column(
+        MutableDict.as_mutable(db.JSON), default={}
+    )  # dict that stores the class times, class_time["CSE 108"] = MWF 10:00-11:15 AM
     class_professor = db.Column(MutableDict.as_mutable(db.JSON), default={})
     class_status = db.Column(MutableDict.as_mutable(db.JSON), default={})
     is_admin = db.Column(db.Boolean, default=False)  # Use this flag for admin access
@@ -87,28 +91,24 @@ class Class(UserMixin, db.Model):
     max_capacity = db.Column(db.Integer, nullable=False)
 
 
-class AdminModelView(ModelView):
-    def is_accessible(self):
-        return current_user.is_authenticated and current_user.is_admin
-
-    def inaccessible_callback(self, name, **kwargs):
-        # Redirect to the login page if the user doesn't have access
-        return redirect(url_for("login"))
-
-
 # Register the models with Flask-Admin
 # This code adds the Users model to the admin panel, allowing you to manage them through the Flask-Admin interface
-admin.add_view(AdminModelView(Users, db.session))
+admin.add_view(ModelView(Users, db.session))
 
 
 # Check access before processing any request to the /admin route
 @app.before_request
 def restrict_admin():
     # Only allow access to /admin if the user is logged in and is an admin
-    if request.path.startswith("/admin") and not (
-        current_user.is_authenticated and current_user.is_admin
-    ):
-        return redirect(url_for("login"))
+    if request.path.startswith("/admin"):
+        if not current_user.is_authenticated:
+            # Redirect to login page if the user is not logged in
+            flash("Please log in.")
+            return redirect(url_for("login"))
+        elif not current_user.is_admin:
+            # Redirect to home page if the user is logged in but not an admin
+            flash("You do not have permission to access the admin dashboard.")
+            return redirect(url_for("home"))
 
 
 # Creates a user loader callback that returns the user object given an id
@@ -135,22 +135,19 @@ def register():
         if username_in_use:
             flash("Username is already in use!", category="error")
             return redirect(url_for("register"))
-        
-        elif request.form.get("role") == "True":
-            password = request.form.get("password")
-            hashed_password = generate_password_hash(password)
-            user = Users(username=request.form.get("username"), password=hashed_password, teacher=True)
-            db.session.add(user)
-            db.session.commit()
 
-        else:
-            password = request.form.get("password")
-            hashed_password = generate_password_hash(password)
-            user = Users(
-                username=request.form.get("username"), password=hashed_password
-            )
-            db.session.add(user)
-            db.session.commit()
+        password = request.form.get("password")
+        hashed_password = generate_password_hash(password)
+        isTeacher = request.form.get("teacherRole") == "True"
+        isAdmin = request.form.get("adminRole") == "True"
+        user = Users(
+            username=request.form.get("username"),
+            password=hashed_password,
+            teacher=isTeacher,
+            is_admin=isAdmin,
+        )
+        db.session.add(user)
+        db.session.commit()
 
         # Once user account created, redirect them to login route
         return redirect(url_for("login"))
