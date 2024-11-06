@@ -22,6 +22,7 @@ function showTable(tableId) {
 
 function addClass(content) {
     let class_name = content.getAttribute('course-name')
+    
     return updateClasses(class_name, 'add')
 }
 

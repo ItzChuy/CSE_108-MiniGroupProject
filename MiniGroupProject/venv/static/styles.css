@@ -66,6 +66,17 @@ nav a:hover {
     border: none;
 }
 
+#LogIn input[type="password"] {
+    width: 100%; 
+    padding: 8px; 
+    letter-spacing: 0.9px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    font-size: 16px; 
+    border-radius: 5px; 
+    border: none;
+}
+
 #LogIn input[type="submit"] {
     font-size: 15px;
     border-radius: 25px;
@@ -190,4 +201,9 @@ nav a:hover {
 .classIcon:hover {
     /* width: 60px; */
     cursor: pointer;
+}
+
+#teacherPrompt{
+    font-size: 5px;
+    /* color: aquamarine; */
 }
