@@ -220,7 +220,15 @@ def logout():
 
 @app.route("/classes")
 def classes():
-    return render_template("classes.html")
+    class_names = [item['class_name'] for item in current_user.classes]
+
+    # Iterate over the list and print only the class names
+    # for item in current_user.classes:
+    #     print(item['class_name']) ahhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
+    return render_template("classes.html",class_names=class_names)
+
+
+
 
 
 @app.route("/addClasses")
@@ -230,89 +238,62 @@ def addClasses():
 
 @app.route("/updateClasses/<string:action>", methods=["POST"])
 def updateClasses(action):
+    data = request.get_json()  # Expecting data as a JSON object, e.g., {"class_name": "CSE 108", "grade": 100}
+    class_name = data["class_name"]
+    grade = data.get("grade", 100)  # Default grade to 100 if not provided
 
-    user_class = request.get_json()
-    print(user_class)
-
-    if offered_classes_status[user_class] == False:
-        return jsonify({"error": "class is full"}), 400  # Send 400 status for an error
+    if offered_classes_status[class_name] == False:
+        return jsonify({"error": "class is full"}), 400
 
     if action == "add":
+        # Check if the class with the grade already exists
+        if any(cls["class_name"] == class_name for cls in current_user.classes):
+            return jsonify({"error": "Already registered for this class"}), 400
 
-        if user_class in current_user.classes:
-            return (
-                jsonify({"error": "Already registered for this class"}),
-                400,
-            )  # Send 400 status for an error
-
-        current_user.classes.append(user_class)
-        current_user.class_time[user_class] = offered_classes_times[user_class]
-        current_user.class_professor[user_class] = offered_classes_professors[
-            user_class
-        ]
-        offered_classes_enrollment[user_class] = (
-            offered_classes_enrollment[user_class] + 1
-        )
-        current_user.class_status[user_class] = (
-            str(offered_classes_enrollment[user_class])
-            + "/"
-            + str(offered_classes_capacity[user_class])
+        # Append the class with its default grade
+        current_user.classes.append({"class_name": class_name, "grade": grade})
+        current_user.class_time[class_name] = offered_classes_times[class_name]
+        current_user.class_professor[class_name] = offered_classes_professors[class_name]
+        
+        offered_classes_enrollment[class_name] += 1
+        current_user.class_status[class_name] = (
+            f"{offered_classes_enrollment[class_name]}/{offered_classes_capacity[class_name]}"
         )
 
-        if (
-            offered_classes_enrollment[user_class]
-            == offered_classes_capacity[user_class]
-        ):
-            offered_classes_status[user_class] = False
-        # print(current_user.classes)
-        # print(current_user.class_professor)
-        # print(current_user.class_time)
-        # print(current_user.class_status)
+        # Update status if the class becomes full
+        if offered_classes_enrollment[class_name] == offered_classes_capacity[class_name]:
+            offered_classes_status[class_name] = False
 
-        db.session.merge(current_user)  # Ensures current_user is tracked in session
+        db.session.merge(current_user)
         db.session.commit()
 
-        # print(current_user.classes)
-        # print(current_user.class_professor)
-        # print(current_user.class_time)
-        # print(current_user.class_status)
+        return jsonify({
+            "classes": current_user.classes,
+            "class_professor": current_user.class_professor,
+            "class_time": current_user.class_time,
+            "class_status": current_user.class_status,
+        })
 
-        return jsonify(
-            {
-                "classes": current_user.classes,
-                "class_professor": current_user.class_professor,
-                "class_time": current_user.class_time,
-                # 'class_time': ["TH 10:30-11:45 AM"],
-                "class_status": current_user.class_status,
-            }
-        )
+    elif action == "drop":
+        current_user.classes = [cls for cls in current_user.classes if cls["class_name"] != class_name]
+        del current_user.class_time[class_name]
+        del current_user.class_professor[class_name]
+        del current_user.class_status[class_name]
+        offered_classes_enrollment[class_name] -= 1
 
-    if action == "drop":
-        current_user.classes.remove(user_class)
-        del current_user.class_time[user_class]
-        del current_user.class_professor[user_class]
-        del current_user.class_status[user_class]
-        offered_classes_enrollment[user_class] = (
-            offered_classes_enrollment[user_class] - 1
-        )
+        if offered_classes_enrollment[class_name] != offered_classes_capacity[class_name]:
+            offered_classes_status[class_name] = True
 
-        if (
-            offered_classes_enrollment[user_class]
-            != offered_classes_capacity[user_class]
-        ):
-            offered_classes_status[user_class] = True
-
-        db.session.merge(current_user)  # Ensures current_user is tracked in session
+        db.session.merge(current_user)
         db.session.commit()
 
-        return jsonify(
-            {
-                "classes": current_user.classes,
-                "class_professor": current_user.class_professor,
-                "class_time": current_user.class_time,
-                "class_status": current_user.class_status,
-            }
-        )
+        return jsonify({
+            "classes": current_user.classes,
+            "class_professor": current_user.class_professor,
+            "class_time": current_user.class_time,
+            "class_status": current_user.class_status,
+        })
+
 
 
 @app.route("/user_table")
