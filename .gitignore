@@ -1,3 +1,11 @@
 MiniGroupProject/venv/venv
 MiniGroupProject/venv/__pycache__
 MiniGroupProject/venv/instance/test.sql
+<<<<<<< Updated upstream
+
+MiniGroupProject/venv/__pycache__/app.cpython-312.pyc
+MiniGroupProject/venv/__pycache__/app.cpython-312.pyc
+=======
+# rip
+.DS_Store
+>>>>>>> Stashed changes
