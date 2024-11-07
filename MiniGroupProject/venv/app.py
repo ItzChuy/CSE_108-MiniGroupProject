@@ -10,6 +10,10 @@ from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.mutable import MutableDict, MutableList
+from flask_admin.form import BaseForm
+from wtforms import StringField, PasswordField, BooleanField, Field
+from wtforms.validators import DataRequired
+from wtforms.fields import TextAreaField
 import json
 
 app = Flask(__name__)
@@ -24,23 +28,6 @@ admin = Admin(app, name="My Admin Panel", template_mode="bootstrap4")
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-
-
-class Users(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(255), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)
-    teacher = db.Column(db.Boolean, nullable=False, default=False)
-    classes = db.Column(
-        MutableList.as_mutable(db.JSON), default=[]
-    )  # list of the class ["CSE 108", "CSE 162"]
-    class_time = db.Column(
-        MutableDict.as_mutable(db.JSON), default={}
-    )  # dict that stores the class times, class_time["CSE 108"] = MWF 10:00-11:15 AM
-    class_professor = db.Column(MutableDict.as_mutable(db.JSON), default={})
-    class_status = db.Column(MutableDict.as_mutable(db.JSON), default={})
-    is_admin = db.Column(db.Boolean, default=False)  # Use this flag for admin access
-
 
 # Predfined for seeing how it works but maybe admin adds the classes? ###############################
 offered_classes = ["Physics 121", "CSE 108", "Math 131", "CSE 162"]
@@ -83,6 +70,24 @@ offered_classes_professors = {
 #########################################################################################################
 
 
+class Users(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(255), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+    teacher = db.Column(db.Boolean, nullable=False, default=False)
+    classes = db.Column(
+        MutableList.as_mutable(db.JSON), default=[]
+    )  # list of the class ["CSE 108", "CSE 162"]
+    class_time = db.Column(
+        MutableDict.as_mutable(db.JSON), default={}
+    )  # dict that stores the class times, class_time["CSE 108"] = MWF 10:00-11:15 AM
+    class_professor = db.Column(MutableDict.as_mutable(db.JSON), default={})
+    class_status = db.Column(MutableDict.as_mutable(db.JSON), default={})
+    is_admin = db.Column(
+        db.Boolean, nullable=False, default=False
+    )  # Use this flag for admin access
+
+
 class Class(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), unique=True, nullable=False)
@@ -91,9 +96,23 @@ class Class(UserMixin, db.Model):
     max_capacity = db.Column(db.Integer, nullable=False)
 
 
+class AdminModelView(ModelView):
+    def is_accessible(self):
+        return current_user.is_authenticated and current_user.is_admin
+
+    def inaccessible_callback(self, name, **kwargs):
+        if current_user.is_authenticated:
+            flash("You do not have permission to access the admin dashboard.")
+            return redirect(url_for("home"))
+        else:
+            flash("Please log in.")
+            return redirect(url_for("login"))
+
+
 # Register the models with Flask-Admin
 # This code adds the Users model to the admin panel, allowing you to manage them through the Flask-Admin interface
-admin.add_view(ModelView(Users, db.session))
+admin.add_view(AdminModelView(Users, db.session))
+admin.add_view(AdminModelView(Class, db.session))
 
 
 # Check access before processing any request to the /admin route
@@ -113,7 +132,7 @@ def restrict_admin():
 
 # Creates a user loader callback that returns the user object given an id
 @login_manager.user_loader
-def loader_user(user_id):
+def user_loader(user_id):
     return Users.query.get(user_id)
 
 
