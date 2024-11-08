@@ -24,7 +24,9 @@
         <nav>
             {% if current_user.is_authenticated %}
             <a href="/classes">Classes</a>
+            {% if current_user.teacher %}
             <a href="/teacher">Teacher View</a>
+            {% endif %}
             <a href="/logout">Logout</a>
             {% else %}
             <a href="/login">Log In</a>
