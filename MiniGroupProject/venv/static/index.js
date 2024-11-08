@@ -146,69 +146,123 @@ async function class_enrollment(class_name) {
     }
 }
 
-async function updateClasses(data, method) {
+// async function updateClasses(data, method) {
+//     const table = document.getElementById("user_classes");
+
+//     const url = method === "add" ? "/updateClasses/add" : "/updateClasses/drop";
+
+//     // try {
+//     //     const response = await fetch(`http://127.0.0.1:5000${url}`, {
+//     //         method: "POST",
+//     //         headers: {
+//     //             "Content-Type": "application/json"
+//     //         },
+//     //         body: JSON.stringify(data_input),
+//     //     })
+
+//     //     if (!response.ok) {
+//     //         throw new Error(`Failed to update classes: ${response.statusText}`);
+//     //     }
+
+//     //     const data = await response.json();
+//     //     console.log(data);
+
+//     //     // Reset and rebuild the user_classes table
+//     //     table.innerHTML = `
+//     //         <tr>
+//     //             <th>Course Name</th>
+//     //             <th>Teacher</th>
+//     //             <th>Time</th>
+//     //             <th>Students Enrolled</th>
+//     //         </tr>
+//     //     `;
+
+//     //     for (let cls of data.classes) {
+//     //         let current_class = cls.class_name;
+//     //         table.insertAdjacentHTML("beforeend", `
+//     //             <tr> 
+//     //                 <td> ${cls.class_name} </td> 
+//     //                 <td> ${data.class_professor[current_class]} </td> 
+//     //                 <td> ${data.class_time[current_class]} </td> 
+//     //                 <td> ${data.class_status[current_class]} </td> 
+//     //             </tr>
+//     //         `);
+//     //     }
+
+//     //     // Update courses_table enrollment dynamically
+//     //     await class_enrollment(data.class_name);
+//     //     saveTableToLocalStorage();
+//     //     // location.reload();
+
+//     // } catch (error) {
+//     //     console.error(`Error updating classes for ${data.class_name}:`, error);
+//     // }
+
+//     fetch(`http://127.0.0.1:5000${url}`, {
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json"
+//         },
+//         body: JSON.stringify(data),
+//     })
+//     .then(res => res.json())
+//     .then(data => {
+//         console.log(data);
+
+//         table.innerHTML = `
+//             <tr>
+//                 <th>Course Name</th>
+//                 <th>Teacher</th>
+//                 <th>Time</th>
+//                 <th>Students Enrolled</th>
+//             </tr>
+//         `;
+
+//         for (let cls of data.classes) {
+//             let current_class = cls.class_name;
+//             table.insertAdjacentHTML("beforeend", `
+//                 <tr> 
+//                     <td> ${cls.class_name} </td> 
+//                     <td> ${data.class_professor[current_class]} </td> 
+//                     <td> ${data.class_time[current_class]} </td> 
+//                     <td> ${data.class_status[current_class]} </td> 
+//                 </tr>
+//             `);
+//         }
+
+//         // Update courses_table enrollment dynamically
+//         // await class_enrollment(data.class_name);
+//         saveTableToLocalStorage();
+//         location.reload();
+//     })
+//     .catch(error => {
+//         console.error(error);
+//     });
+// }
+
+async function updateClasses(class_data, method) {
     const table = document.getElementById("user_classes");
 
-    const url = method === "add" ? "/updateClasses/add" : "/updateClasses/drop";
+    try {
+        const url = `http://127.0.0.1:5000/updateClasses/${method}`;
+        console.log("Sending data to:", url, "with payload:", class_data);
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(class_data),
+        });
 
-    // try {
-    //     const response = await fetch(`http://127.0.0.1:5000${url}`, {
-    //         method: "POST",
-    //         headers: {
-    //             "Content-Type": "application/json"
-    //         },
-    //         body: JSON.stringify(data_input),
-    //     })
+        if (!response.ok) {
+            throw new Error(`Failed to update classes: ${response.statusText}`);
+        }
 
-    //     if (!response.ok) {
-    //         throw new Error(`Failed to update classes: ${response.statusText}`);
-    //     }
+        const data = await response.json();
+        console.log("Response from server:", data)
+        // console.log(data);
 
-    //     const data = await response.json();
-    //     console.log(data);
-
-    //     // Reset and rebuild the user_classes table
-    //     table.innerHTML = `
-    //         <tr>
-    //             <th>Course Name</th>
-    //             <th>Teacher</th>
-    //             <th>Time</th>
-    //             <th>Students Enrolled</th>
-    //         </tr>
-    //     `;
-
-    //     for (let cls of data.classes) {
-    //         let current_class = cls.class_name;
-    //         table.insertAdjacentHTML("beforeend", `
-    //             <tr> 
-    //                 <td> ${cls.class_name} </td> 
-    //                 <td> ${data.class_professor[current_class]} </td> 
-    //                 <td> ${data.class_time[current_class]} </td> 
-    //                 <td> ${data.class_status[current_class]} </td> 
-    //             </tr>
-    //         `);
-    //     }
-
-    //     // Update courses_table enrollment dynamically
-    //     await class_enrollment(data.class_name);
-    //     saveTableToLocalStorage();
-    //     // location.reload();
-
-    // } catch (error) {
-    //     console.error(`Error updating classes for ${data.class_name}:`, error);
-    // }
-
-    fetch(`http://127.0.0.1:5000${url}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data),
-    })
-    .then(res => res.json())
-    .then(data => {
-        console.log(data);
-
+        // Reset and rebuild the user_classes table
         table.innerHTML = `
             <tr>
                 <th>Course Name</th>
@@ -219,23 +273,26 @@ async function updateClasses(data, method) {
         `;
 
         for (let cls of data.classes) {
-            let current_class = cls.class_name;
+            const current_class = cls.class_name;
             table.insertAdjacentHTML("beforeend", `
-                <tr> 
-                    <td> ${cls.class_name} </td> 
-                    <td> ${data.class_professor[current_class]} </td> 
-                    <td> ${data.class_time[current_class]} </td> 
-                    <td> ${data.class_status[current_class]} </td> 
+                <tr>
+                    <td>${cls.class_name}</td>
+                    <td>${data.class_professor[current_class]}</td>
+                    <td>${data.class_time[current_class]}</td>
+                    <td>${data.class_status[current_class]}</td>
                 </tr>
             `);
         }
 
         // Update courses_table enrollment dynamically
-        // await class_enrollment(data.class_name);
+        await class_enrollment(class_data.class_name);
+
+        // Save updated tables to localStorage
         saveTableToLocalStorage();
-        location.reload();
-    })
-    .catch(error => {
-        console.error(error);
-    });
+
+        // Optionally reload the page to reflect changes
+        // location.reload();
+    } catch (error) {
+        console.error(`Error updating classes for ${class_data.class_name}:`, error);
+    }
 }
