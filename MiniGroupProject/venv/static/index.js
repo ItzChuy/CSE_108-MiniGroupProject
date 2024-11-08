@@ -2,6 +2,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     // Load the saved table on page load (new)
     loadTableFromLocalStorage();
+    loadCoursesTableFromLocalStorage();
 
     // shows the user_classes table by default
     showTable('user_classes');
@@ -66,6 +67,45 @@ function loadTableFromLocalStorage() {
         });
 
         table.appendChild(row); // Append the row to the table
+    });
+}
+
+function saveCoursesTableToLocalStorage() {
+    // Clear the previous saved data from localStorage
+    localStorage.removeItem("coursesTable");
+
+    const coursesTable = document.getElementById("courses_table");
+    const coursesData = [];
+
+    // Loop through each row and find `capacity-...` cells
+    coursesTable.querySelectorAll("[id^='capacity-']").forEach(cell => {
+        coursesData.push({
+            id: cell.id, // Save the unique id (e.g., capacity-CSE-108)
+            value: cell.textContent.trim() // Save the cell's text content
+        });
+    });
+
+    // console.log("Saved Courses Data:", coursesData); // Debug log
+    localStorage.setItem("coursesTable", JSON.stringify(coursesData));
+}
+
+// Load the courses_table specific <td> data from localStorage
+function loadCoursesTableFromLocalStorage() {
+    const coursesData = JSON.parse(localStorage.getItem("coursesTable"));
+
+    if (!coursesData) {
+        console.log("No saved courses table data found.");
+        return;
+    }
+
+    console.log("Loaded Courses Data:", coursesData); // Debug log
+
+    coursesData.forEach(item => {
+        const cell = document.getElementById(item.id); // Find the cell by its unique id
+        if (cell) {
+            // console.log(`Updating cell ${item.id} with value ${item.value}`); // Debug log
+            cell.textContent = item.value; // Update the cell's content
+        }
     });
 }
 

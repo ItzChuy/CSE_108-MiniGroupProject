@@ -40,7 +40,7 @@ offered_classes_times = {
 }
 
 offered_classes_enrollment = {
-    "Physics 121": 5,
+    "Physics 121": 8,
     "CSE 108": 4,
     "Math 131": 1,
     "CSE 162": 1,
@@ -336,6 +336,21 @@ def updateClasses(action):
 def userTable():
     return render_template("classes.html")
 
+@app.route("/enrollment/<string:class_name>")
+def enrollmentUpdate(class_name):
+    class_enrollment = offered_classes_enrollment[class_name]
+    class_enrollment_string = ""
+    if class_enrollment == offered_classes_capacity[class_name]:
+        class_enrollment_string = "FULL"
+    else:
+        class_enrollment_string = str(class_enrollment) + "/" + str(offered_classes_capacity[class_name])
+    class_id_format = class_name.strip().replace(" ", "-") # e.g. CSE 108 -> CSE-108
+    return jsonify(
+        {
+            "class_enrollment": class_enrollment_string,
+            "class_id_format": class_id_format
+        }
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)
