@@ -121,10 +121,83 @@ function dropClass(content) {
     return updateClasses({ class_name }, 'drop');  // grade is not needed for dropping
 }
 
-function updateClasses(data, method) {
+async function class_enrollment(class_name) {
+    try {
+        const response = await fetch(`/enrollment/${class_name}`);
+        if (!response.ok) {
+            throw new Error(`Network error: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        // Update the capacity cell
+        const capacityCell = document.getElementById(`capacity-${data.class_id_format}`);
+        if (capacityCell) {
+            capacityCell.textContent = data.class_enrollment;
+            console.log(`Updated ${data.class_id_format} capacity to ${data.class_enrollment}`); // Debug log
+
+            // Save the updated table to localStorage
+            saveCoursesTableToLocalStorage();
+        } else {
+            console.warn(`Capacity cell not found for ${data.class_id_format}`);
+        }
+    } catch (error) {
+        console.error(`Error updating enrollment for ${class_name}:`, error);
+    }
+}
+
+async function updateClasses(data, method) {
     const table = document.getElementById("user_classes");
 
     const url = method === "add" ? "/updateClasses/add" : "/updateClasses/drop";
+
+    // try {
+    //     const response = await fetch(`http://127.0.0.1:5000${url}`, {
+    //         method: "POST",
+    //         headers: {
+    //             "Content-Type": "application/json"
+    //         },
+    //         body: JSON.stringify(data_input),
+    //     })
+
+    //     if (!response.ok) {
+    //         throw new Error(`Failed to update classes: ${response.statusText}`);
+    //     }
+
+    //     const data = await response.json();
+    //     console.log(data);
+
+    //     // Reset and rebuild the user_classes table
+    //     table.innerHTML = `
+    //         <tr>
+    //             <th>Course Name</th>
+    //             <th>Teacher</th>
+    //             <th>Time</th>
+    //             <th>Students Enrolled</th>
+    //         </tr>
+    //     `;
+
+    //     for (let cls of data.classes) {
+    //         let current_class = cls.class_name;
+    //         table.insertAdjacentHTML("beforeend", `
+    //             <tr> 
+    //                 <td> ${cls.class_name} </td> 
+    //                 <td> ${data.class_professor[current_class]} </td> 
+    //                 <td> ${data.class_time[current_class]} </td> 
+    //                 <td> ${data.class_status[current_class]} </td> 
+    //             </tr>
+    //         `);
+    //     }
+
+    //     // Update courses_table enrollment dynamically
+    //     await class_enrollment(data.class_name);
+    //     saveTableToLocalStorage();
+    //     // location.reload();
+
+    // } catch (error) {
+    //     console.error(`Error updating classes for ${data.class_name}:`, error);
+    // }
+
     fetch(`http://127.0.0.1:5000${url}`, {
         method: "POST",
         headers: {
@@ -157,6 +230,8 @@ function updateClasses(data, method) {
             `);
         }
 
+        // Update courses_table enrollment dynamically
+        // await class_enrollment(data.class_name);
         saveTableToLocalStorage();
         location.reload();
     })
