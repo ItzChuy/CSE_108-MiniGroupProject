@@ -1,57 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard</title>
     <link rel="stylesheet" href="../static/styles.css" />
-    <title>Teacher Portal</title>
 </head>
-
 <body>
+    <!-- Navbar -->
     <header class="navbar">
-        <a href="/"><img id="icon" src="../static/images/ucm-logo.png"></a>
+        <a href="/"><img id="icon" src="../static/images/ucm-logo.png" alt="UCM Logo"></a>
         <nav>
             <a href="#" id="classes" onclick="showTable('user_classes'); return false;">Classes</a>
             <a href="/logout">Logout</a>
         </nav>
     </header>
 
+    <!-- Main Content -->
     <div id="homePrompt">
+        <h1>Teacher Dashboard</h1>
+
+        <h2>Your Classes</h2>
+        
+        <!-- Table to display the teacher's classes -->
         <div id="tableDiv">
-            <table id="user_classes" class="tables">
-                <tr>
-                    <th> Course Name </th>
-                    <th> Teacher </th>
-                    <th> Time </th>
-                    <th> Students Enrolled </th>
-                </tr>
-                <tr>
-                    <td><a href="#" onclick="showTable('courses_table'); return false;">CSE 108</a></td>
-                    <td> Ammon Hepworth </td>
-                    <td> TR 11:00-11:50 AM </td>
-                    <td> 5/10 </td>
-                </tr>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Course Name</th>
+                        <th>Teacher</th>
+                        <th>Time</th>
+                        <th>Students Enrolled</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for class in class_details %}
+                        <tr>
+                            <td>{{ class.course_name }}</td>
+                            <td>{{ class.teacher }}</td>
+                            <td>{{ class.time }}</td>
+                            <td>{{ class.enrollment }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
             </table>
-        </div>
-
-        <div id="courses_table" class="tables">
-            <h3>Class: CSE 108</h3>
-            <table>
-                <tr>
-                    <th> Student Name </th>
-                    <th> Grade </th>
-                </tr>
-                <tr>
-                    <td> John Smith </td>
-                    <td> 75 </td>
-                </tr>
-            </table>
-
         </div>
     </div>
 
     <script src="../static/index.js"></script>
 </body>
-
 </html>

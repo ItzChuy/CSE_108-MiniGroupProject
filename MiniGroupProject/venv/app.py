@@ -235,6 +235,29 @@ def classes():
 def addClasses():
     return render_template("addclasses.html")
 
+from flask_login import current_user
+
+@app.route('/teacher')
+def teacher():
+    if current_user.is_authenticated and current_user.teacher:  # Check if the user is logged in and is a teacher
+        teacher_classes = current_user.classes  # Get the list of classes the teacher is teaching
+
+        # Prepare a list of class details to pass to the template
+        class_details = []
+        for class_name in teacher_classes:
+            class_info = {
+                'course_name': class_name,
+                'teacher': offered_classes_professors.get(class_name, 'N/A'),
+                'time': offered_classes_times.get(class_name, 'N/A'),
+                'enrollment': f"{offered_classes_enrollment.get(class_name, 0)} / {offered_classes_capacity.get(class_name, 0)}"
+            }
+            class_details.append(class_info)
+
+        return render_template('teacher.html', class_details=class_details)
+
+    return redirect(url_for('login'))  # Redirect if user is not logged in or not a teacher
+
+
 
 @app.route("/updateClasses/<string:action>", methods=["POST"])
 def updateClasses(action):
@@ -293,6 +316,19 @@ def updateClasses(action):
             "class_time": current_user.class_time,
             "class_status": current_user.class_status,
         })
+
+# # # dont uncomment this!!
+# @app.route("/add_class_to_teacher")
+# def add_class_to_teacher():
+#     teacher = Users.query.filter_by(username="Juan Meza").first()
+    
+#     if teacher and "Math 131" not in teacher.classes:
+#         teacher.classes.append("Math 131")
+#         db.session.commit()  # Save the changes
+#         return "Class added successfully!"
+    
+#     return "Class already exists or user not found."
+
 
 
 
