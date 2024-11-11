@@ -23,7 +23,9 @@
         <a href="/"><img id="icon" src="../static/images/ucm-logo.png"></a>
         <nav>
             {% if current_user.is_authenticated %}
+            {% if not current_user.teacher %}
             <a href="/classes">Classes</a>
+            {% endif %}
             {% if current_user.teacher %}
             <a href="/teacher">Teacher View</a>
             {% endif %}
@@ -34,6 +36,7 @@
             {% endif %}
         </nav>
     </header>
+    
 
     <div id="homePrompt">
         <p id="homeMessage"> Welcome to the University of California, Merced Portal </p>
