@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Details</title>
+    <link rel="stylesheet" href="../static/styles.css" />
+</head>
+<body>
+
+    <header class="navbar">
+        <a href="/"><img id="icon" src="../static/images/ucm-logo.png" alt="UCM Logo"></a>
+        <nav>
+            <a href="/teacher">Back to Dashboard</a>
+            <a href="/logout">Logout</a>
+        </nav>
+    </header>
+
+ 
+    <div id="classDetailPrompt">
+        <h1>{{ class_name }} - Student Grades</h1>
+
+        <div id="studentTableDiv">
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Grade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                        <tr>
+                            <td>{{ student.name }}</td>
+                            <td>{{ student.grade }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

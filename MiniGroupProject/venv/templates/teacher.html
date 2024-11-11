@@ -36,7 +36,12 @@
                 <tbody>
                     {% for class in class_details %}
                         <tr>
-                            <td>{{ class.course_name }}</td>
+                            <!-- Updated course name link in the table -->
+                            <td>
+                                <a href="/class_details/{{ class.course_name }}">
+                                    {{ class.course_name }}
+                                </a>
+                            </td>
                             <td>{{ class.teacher }}</td>
                             <td>{{ class.time }}</td>
                             <td>{{ class.enrollment }}</td>

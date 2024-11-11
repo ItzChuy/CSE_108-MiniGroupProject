@@ -261,19 +261,19 @@ def teacher():
 
 @app.route("/updateClasses/<string:action>", methods=["POST"])
 def updateClasses(action):
-    data = request.get_json()  # Expecting data as a JSON object, e.g., {"class_name": "CSE 108", "grade": 100}
+    data = request.get_json()  # expectiing data as a JSON object, e.g., {"class_name": "CSE 108", "grade": 100}
     class_name = data["class_name"]
-    grade = data.get("grade", 100)  # Default grade to 100 if not provided
+    grade = data.get("grade", 100)  
 
     if offered_classes_status[class_name] == False:
         return jsonify({"error": "class is full"}), 400
 
     if action == "add":
-        # Check if the class with the grade already exists
+        
         if any(cls["class_name"] == class_name for cls in current_user.classes):
             return jsonify({"error": "Already registered for this class"}), 400
 
-        # Append the class with its default grade
+      
         current_user.classes.append({"class_name": class_name, "grade": grade})
         current_user.class_time[class_name] = offered_classes_times[class_name]
         current_user.class_professor[class_name] = offered_classes_professors[class_name]
@@ -283,7 +283,7 @@ def updateClasses(action):
             f"{offered_classes_enrollment[class_name]}/{offered_classes_capacity[class_name]}"
         )
 
-        # Update status if the class becomes full
+       
         if offered_classes_enrollment[class_name] == offered_classes_capacity[class_name]:
             offered_classes_status[class_name] = False
 
@@ -351,6 +351,23 @@ def enrollmentUpdate(class_name):
             "class_id_format": class_id_format
         }
     )
+    
+@app.route("/class_details/<string:class_name>")
+def class_details(class_name):
+    students = []
+    for user in Users.query.all():
+        
+        if class_name in user.classes and not user.teacher:
+           
+            grade = user.class_status.get(class_name, "N/A") 
+            students.append({
+                "name": user.username,
+                "grade": grade
+            })
+
+
+    return render_template("class_details.html", class_name=class_name, students=students)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
