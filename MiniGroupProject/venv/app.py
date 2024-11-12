@@ -11,7 +11,7 @@ from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.mutable import MutableDict, MutableList
 from flask_admin.form import BaseForm
-from wtforms import StringField, PasswordField, BooleanField, Field
+from wtforms import StringField, PasswordField, BooleanField, Field, TextAreaField, ValidationError
 from wtforms.validators import DataRequired
 from wtforms.fields import TextAreaField
 import json
@@ -97,6 +97,16 @@ class Class(UserMixin, db.Model):
 
 
 class AdminModelView(ModelView):
+    # form_excluded_columns = ['password']
+    # Make the 'password' field read-only in the form
+    form_widget_args = {
+        'password': {
+            'readonly': True
+        },
+        'username': {
+            'readonly': True
+        }
+    }
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin
 
@@ -107,6 +117,7 @@ class AdminModelView(ModelView):
         else:
             flash("Please log in.")
             return redirect(url_for("login"))
+        
 
 
 # Register the models with Flask-Admin
