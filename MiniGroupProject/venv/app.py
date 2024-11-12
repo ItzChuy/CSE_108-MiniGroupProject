@@ -357,26 +357,25 @@ def enrollmentUpdate(class_name):
 def class_details(class_name):
     students = []
     for user in Users.query.all():
+        print(user.username)
         
-        if isinstance(user.classes, list):
-        
-           
-            for cls in user.classes:
-                if isinstance(cls, dict) and cls.get("class_name") == class_name and not user.teacher:
-                    print("Hello", cls.get("class_name"))
+        # Check if the class name is in the user's classes list
+        if isinstance(user.classes, list) and class_name in user.classes and not user.teacher:
+            print("Hello", class_name)
+            print(user.username)
+            print("===================")
 
-
-                    grade = cls.get("grade", "N/A")
-                    students.append({
-                        "name": user.username,
-                        "grade": grade
-                    })
+            # Since grade data is not stored in user.classes, use a default or add a separate mechanism to track it
+            grade = "N/A"  # Or get grade from another source if available
+            students.append({
+                "name": user.username,
+                "grade": grade
+            })
         else:
-           
             print(f"Unexpected structure for user.classes: {user.classes}")
     
-   
     return render_template("class_details.html", class_name=class_name, students=students)
+
 
 
 if __name__ == "__main__":
