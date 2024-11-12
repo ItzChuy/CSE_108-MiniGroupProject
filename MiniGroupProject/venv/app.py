@@ -352,20 +352,30 @@ def enrollmentUpdate(class_name):
         }
     )
     
+
 @app.route("/class_details/<string:class_name>")
 def class_details(class_name):
     students = []
     for user in Users.query.all():
         
-        if class_name in user.classes and not user.teacher:
+        if isinstance(user.classes, list):
+        
            
-            grade = user.class_status.get(class_name, "N/A") 
-            students.append({
-                "name": user.username,
-                "grade": grade
-            })
+            for cls in user.classes:
+                if isinstance(cls, dict) and cls.get("class_name") == class_name and not user.teacher:
+                    print("Hello", cls.get("class_name"))
 
 
+                    grade = cls.get("grade", "N/A")
+                    students.append({
+                        "name": user.username,
+                        "grade": grade
+                    })
+        else:
+           
+            print(f"Unexpected structure for user.classes: {user.classes}")
+    
+   
     return render_template("class_details.html", class_name=class_name, students=students)
 
 
