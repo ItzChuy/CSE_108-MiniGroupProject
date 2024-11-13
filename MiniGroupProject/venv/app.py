@@ -391,20 +391,23 @@ def updateCourses():
 def class_details(class_name):
     students = []
     for user in Users.query.all():
-        print(user.username)
         
-        # Check if the class name is in the user's classes list
-        if isinstance(user.classes, list) and class_name in user.classes and not user.teacher:
-            print("Hello", class_name)
-            print(user.username)
-            print("===================")
-
-            # Since grade data is not stored in user.classes, use a default or add a separate mechanism to track it
-            grade = "N/A"  # Or get grade from another source if available
-            students.append({
-                "name": user.username,
-                "grade": grade
-            })
+        # Ensure user.classes is a list and user is not a teacher
+        if isinstance(user.classes, list) and not user.teacher:
+            # Find the matching class entry in the user's classes
+            matching_class = next(
+                (c for c in user.classes if isinstance(c, dict) and c.get("class_name") == class_name), 
+                None
+            )
+            
+            if matching_class:
+                grade = matching_class.get("grade", "N/A")
+                students.append({
+                    "name": user.username,
+                    "grade": grade
+                })
+            else:
+                print(f"Class '{class_name}' not found in user {user.username}'s classes.")
         else:
             print(f"Unexpected structure for user.classes: {user.classes}")
     
