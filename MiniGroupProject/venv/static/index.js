@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Load the saved table on page load (new)
     loadTableFromLocalStorage();
     loadCoursesTableFromLocalStorage();
+    tableStartUp();
 
     // shows the user_classes table by default
     showTable('user_classes');
@@ -239,6 +240,42 @@ async function class_enrollment(class_name) {
 //         console.error(error);
 //     });
 // }
+
+function tableStartUp() {
+    const table = document.getElementById("user_classes");
+
+    try {
+        fetch("http://127.0.0.1:5000/updateClasses/start")
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                // Reset and rebuild the user_classes table
+                table.innerHTML = `
+                <tr>
+                    <th>Course Name</th>
+                    <th>Teacher</th>
+                    <th>Time</th>
+                    <th>Students Enrolled</th>
+                </tr>
+                `;
+
+                for (let cls of data.classes) {
+                    const current_class = cls.class_name;
+                    table.insertAdjacentHTML("beforeend", `
+                        <tr>
+                            <td>${cls.class_name}</td>
+                            <td>${data.class_professor[current_class]}</td>
+                            <td>${data.class_time[current_class]}</td>
+                            <td>${data.class_status[current_class]}</td>
+                        </tr>
+                    `);
+                }
+            })
+
+    } catch (error) {
+        console.error(error);
+    }
+}
 
 async function updateClasses(class_data, method) {
     const table = document.getElementById("user_classes");

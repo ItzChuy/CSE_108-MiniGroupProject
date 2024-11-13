@@ -270,9 +270,19 @@ def teacher():
 
 
 
-@app.route("/updateClasses/<string:action>", methods=["POST"])
+@app.route("/updateClasses/<string:action>", methods=["GET", "POST"])
 def updateClasses(action):
-    data = request.get_json()  # expectiing data as a JSON object, e.g., {"class_name": "CSE 108", "grade": 100}
+    if request.method == "GET":
+        return jsonify({
+            "classes": current_user.classes,
+            "class_professor": current_user.class_professor,
+            "class_time": current_user.class_time,
+            "class_status": current_user.class_status,
+        })
+
+    # else the method is "POST"
+
+    data = request.get_json()  # expecting data as a JSON object, e.g., {"class_name": "CSE 108", "grade": 100}
     class_name = data["class_name"]
     grade = data.get("grade", 100)  
 
