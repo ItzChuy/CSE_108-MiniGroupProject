@@ -90,6 +90,7 @@ class Users(UserMixin, db.Model):
 
 class Class(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    names = db.Column(MutableList.as_mutable(db.JSON), default=["Physics 121", "CSE 108", "Math 131", "CSE 162"])
     name = db.Column(db.String(255), unique=True, nullable=False)
     time = db.Column(db.String(255), nullable=False)
     enrolled = db.Column(db.Integer, nullable=False)
@@ -286,14 +287,13 @@ def updateClasses(action):
     class_name = data["class_name"]
     grade = data.get("grade", 100)  
 
-    if offered_classes_status[class_name] == False:
-        return jsonify({"error": "class is full"}), 400
-
     if action == "add":
         
         if any(cls["class_name"] == class_name for cls in current_user.classes):
             return jsonify({"error": "Already registered for this class"}), 400
-
+        
+        if offered_classes_status[class_name] == False:
+            return jsonify({"error": "class is full"}), 400
       
         current_user.classes.append({"class_name": class_name, "grade": grade})
         current_user.class_time[class_name] = offered_classes_times[class_name]
@@ -373,6 +373,19 @@ def enrollmentUpdate(class_name):
         }
     )
     
+@app.route("/updateCourses", methods=["GET"])
+def updateCourses():
+    formatted_classes = []
+    class_enrollment = {}
+    for cls in offered_classes:
+        format = cls.strip().replace(" ", "-")
+        formatted_classes.append(format)
+        class_enrollment[format] = f"{offered_classes_enrollment[cls]}/{offered_classes_capacity[cls]}"
+
+    return jsonify({
+            "classes": formatted_classes,
+            "enrollment": class_enrollment
+        })
 
 @app.route("/class_details/<string:class_name>")
 def class_details(class_name):

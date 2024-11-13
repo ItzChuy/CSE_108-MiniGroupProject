@@ -275,6 +275,31 @@ function tableStartUp() {
     } catch (error) {
         console.error(error);
     }
+
+    try {
+        fetch("http://127.0.0.1:5000/updateCourses")
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                
+                for(let cls of data.classes) {
+                    // console.log(`capacity-${cls}`)
+                    // console.log(`capacity-${cls} = ${data.enrollment[cls]}`)
+                    const capacityCell = document.getElementById(`capacity-${cls}`);
+
+                    if(data.enrollment[cls] === "10/10") {
+                        capacityCell.innerText = "FULL";
+                    }
+                    else {
+                        capacityCell.innerText = `${data.enrollment[cls]}`;
+                    }
+                    // capacityCell.innerText = `${currentEnrollment}/${totalCapacity}`;
+                }
+            })
+
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 async function updateClasses(class_data, method) {
