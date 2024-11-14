@@ -358,3 +358,50 @@ async function updateClasses(class_data, method) {
         console.error(`Error updating classes for ${class_data.class_name}:`, error);
     }
 }
+
+function editGrade(studentName) {
+    var gradeDisplay = document.getElementById('grade-display-' + studentName);
+    var gradeInput = document.getElementById('grade-input-' + studentName);
+    
+    gradeDisplay.style.display = 'none';
+    gradeInput.style.display = 'inline-block';
+    gradeInput.focus();
+}
+
+function saveGrade(studentName) {
+    var gradeInput = document.getElementById('grade-input-' + studentName);
+    var newGrade = gradeInput.value.trim();
+    
+    // check if grade is b/t 0 and 100
+    if (isNaN(newGrade) || newGrade < 0 || newGrade > 100) {
+        console.error("Invalid grade input. Please enter a number between 0 and 100.");
+        return;
+    }
+    
+    // Get class_name from URL
+    var className = window.location.pathname.split('/')[2]; 
+
+    fetch(`/update_grade/${className}/${studentName}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            new_grade: newGrade
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log(data.message); 
+            document.getElementById('grade-display-' + studentName).innerText = newGrade;
+            document.getElementById('grade-display-' + studentName).style.display = 'inline-block';
+            gradeInput.style.display = 'none';
+        } else {
+            console.error(data.message); 
+        }
+    })
+    .catch(error => {
+        console.error("An error occurred while updating the grade:", error);
+    });
+}

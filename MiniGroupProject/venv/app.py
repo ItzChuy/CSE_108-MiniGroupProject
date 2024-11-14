@@ -413,6 +413,49 @@ def class_details(class_name):
     
     return render_template("class_details.html", class_name=class_name, students=students)
 
+@app.route("/update_grade/<string:class_name>/<string:student_name>", methods=["POST"])
+def update_grade(class_name, student_name):
+    try:
+        data = request.get_json()
+        new_grade = data.get('new_grade')
+
+        if new_grade is None or not new_grade.isdigit() or not (0 <= int(new_grade) <= 100):
+            return jsonify({"success": False, "message": "Invalid grade input. Please enter a number between 0 and 100."})
+
+        user = Users.query.filter_by(username=student_name).first()
+
+        if user:
+            print(f"Current classes for {student_name}: {user.classes}")
+
+            updated_classes = []
+            updated = False  # Track if we made any updates
+
+            for class_entry in user.classes:
+                if isinstance(class_entry, dict) and class_entry.get("class_name") == class_name:
+                    updated_classes.append({
+                        "class_name": class_entry["class_name"],
+                        "grade": int(new_grade)  
+                    })
+                    updated = True
+                else:
+                    updated_classes.append(class_entry)
+
+            if updated:
+                user.classes = updated_classes 
+                db.session.add(user)  
+                db.session.commit()
+
+                print(f"Updated classes for {student_name}: {user.classes}")
+
+                return jsonify({"success": True, "message": f"Grade for {student_name} in {class_name} updated successfully to {new_grade}."})
+            else:
+                return jsonify({"success": False, "message": f"Class {class_name} not found for {student_name}."})
+
+        return jsonify({"success": False, "message": "Student not found."})
+
+    except Exception as e:
+        print(f"Error updating grade: {e}")
+        return jsonify({"success": False, "message": "An error occurred while updating the grade."})
 
 
 if __name__ == "__main__":

@@ -7,8 +7,6 @@
     <link rel="stylesheet" href="../static/styles.css" />
 </head>
 <body>
-
- 
     <header class="navbar">
         <a href="/"><img id="icon" src="../static/images/ucm-logo.png" alt="UCM Logo"></a>
         <nav>
@@ -17,11 +15,9 @@
         </nav>
     </header>
 
-  
     <div id="classDetailPrompt" style="max-width: 800px; margin: 40px auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
         <h1 style="font-size: 24px; color: #0044cc; text-align: center; margin-bottom: 20px;">{{ class_name }} - Student Grades</h1>
 
-      
         <div id="studentTableDiv" style="overflow-x: auto;">
             <table border="1" style="width: 100%; border-collapse: collapse;">
                 <thead>
@@ -34,7 +30,19 @@
                     {% for student in students %}
                         <tr style="background-color: {% if loop.index is divisibleby 2 %} #f2f2f2 {% else %} white {% endif %};">
                             <td style="padding: 10px;">{{ student.name }}</td>
-                            <td style="padding: 10px;">{{ student.grade }}</td>
+                            <td style="padding: 10px;">
+                                    <span id="grade-display-{{ student.name }}" onclick="editGrade('{{ student.name }}')" style="cursor: pointer;">
+                                        {{ student.grade }}
+                                    </span>
+                                    <input 
+                                        type="text"
+                                        id="grade-input-{{ student.name }}" 
+                                        value="{{ student.grade }}" 
+                                        style="display: none; width: 60px; padding: 5px;" 
+                                        onblur="saveGrade('{{ student.name }}')" 
+                                        onkeypress="if(event.key === 'Enter') saveGrade('{{ student.name }}');"
+                                    >
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -42,5 +50,6 @@
         </div>
     </div>
 
+    <script src="../static/index.js"></script> 
 </body>
 </html>
