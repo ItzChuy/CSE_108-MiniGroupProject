@@ -207,3 +207,20 @@ nav a:hover {
     font-size: 5px;
     /* color: aquamarine; */
 }
+
+#class-details-page header {
+    background-color: black;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 92px; 
+    z-index: 10; 
+}
+
+#class-details-page {
+    margin-top: 92px; 
+}
