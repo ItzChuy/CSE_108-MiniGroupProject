@@ -419,8 +419,13 @@ def update_grade(class_name, student_name):
         data = request.get_json()
         new_grade = data.get('new_grade')
 
-        if new_grade is None or not new_grade.isdigit() or not (0 <= int(new_grade) <= 100):
+        try:
+            new_grade = float(new_grade)  
+            if not (0 <= new_grade <= 100):
+                return jsonify({"success": False, "message": "Invalid grade input. Please enter a number between 0 and 100."})
+        except (ValueError, TypeError):
             return jsonify({"success": False, "message": "Invalid grade input. Please enter a number between 0 and 100."})
+
 
         user = Users.query.filter_by(username=student_name).first()
 
@@ -434,7 +439,7 @@ def update_grade(class_name, student_name):
                 if isinstance(class_entry, dict) and class_entry.get("class_name") == class_name:
                     updated_classes.append({
                         "class_name": class_entry["class_name"],
-                        "grade": int(new_grade)  
+                        "grade": float(new_grade)  
                     })
                     updated = True
                 else:

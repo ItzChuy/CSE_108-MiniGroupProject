@@ -373,10 +373,11 @@ function saveGrade(studentName) {
     var newGrade = gradeInput.value.trim();
     
     // check if grade is b/t 0 and 100
+    newGrade = parseFloat(newGrade);
     if (isNaN(newGrade) || newGrade < 0 || newGrade > 100) {
-        console.error("Invalid grade input. Please enter a number between 0 and 100.");
-        return;
-    }
+    console.error("Invalid grade input. Please enter a number between 0 and 100.");
+    return;
+}
     
     // Get class_name from URL
     var className = window.location.pathname.split('/')[2]; 
@@ -387,7 +388,7 @@ function saveGrade(studentName) {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            new_grade: newGrade
+            new_grade: parseFloat(newGrade)
         })
     })
     .then(response => response.json())
