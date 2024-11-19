@@ -11,7 +11,14 @@ from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.mutable import MutableDict, MutableList
 from flask_admin.form import BaseForm
-from wtforms import StringField, PasswordField, BooleanField, Field, TextAreaField, ValidationError
+from wtforms import (
+    StringField,
+    PasswordField,
+    BooleanField,
+    Field,
+    TextAreaField,
+    ValidationError,
+)
 from wtforms.validators import DataRequired
 from wtforms.fields import TextAreaField
 import json
@@ -90,7 +97,10 @@ class Users(UserMixin, db.Model):
 
 class Class(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    names = db.Column(MutableList.as_mutable(db.JSON), default=["Physics 121", "CSE 108", "Math 131", "CSE 162"])
+    names = db.Column(
+        MutableList.as_mutable(db.JSON),
+        default=["Physics 121", "CSE 108", "Math 131", "CSE 162"],
+    )
     name = db.Column(db.String(255), unique=True, nullable=False)
     time = db.Column(db.String(255), nullable=False)
     enrolled = db.Column(db.Integer, nullable=False)
@@ -101,13 +111,10 @@ class AdminModelView(ModelView):
     # form_excluded_columns = ['password']
     # Make the 'password' field read-only in the form
     form_widget_args = {
-        'password': {
-            'readonly': True
-        },
-        'username': {
-            'readonly': True
-        }
+        "password": {"readonly": False},
+        "username": {"readonly": False},
     }
+
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_admin
 
@@ -118,13 +125,12 @@ class AdminModelView(ModelView):
         else:
             flash("Please log in.")
             return redirect(url_for("login"))
-        
 
 
 # Register the models with Flask-Admin
 # This code adds the Users model to the admin panel, allowing you to manage them through the Flask-Admin interface
 admin.add_view(AdminModelView(Users, db.session))
-admin.add_view(AdminModelView(Class, db.session))
+# admin.add_view(AdminModelView(Class, db.session))
 
 
 # Check access before processing any request to the /admin route
@@ -232,130 +238,151 @@ def logout():
 
 @app.route("/classes")
 def classes():
-    class_names = [item['class_name'] for item in current_user.classes]
+    class_names = [item["class_name"] for item in current_user.classes]
 
     # Iterate over the list and print only the class names
     # for item in current_user.classes:
     #     print(item['class_name']) ahhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
-    return render_template("classes.html",class_names=class_names)
-
-
-
+    return render_template("classes.html", class_names=class_names)
 
 
 @app.route("/addClasses")
 def addClasses():
     return render_template("addclasses.html")
 
+
 from flask_login import current_user
 
-@app.route('/teacher')
+
+@app.route("/teacher")
 def teacher():
-    if current_user.is_authenticated and current_user.teacher:  # Check if the user is logged in and is a teacher
-        teacher_classes = current_user.classes  # Get the list of classes the teacher is teaching
+    if (
+        current_user.is_authenticated and current_user.teacher
+    ):  # Check if the user is logged in and is a teacher
+        teacher_classes = (
+            current_user.classes
+        )  # Get the list of classes the teacher is teaching
 
         # Prepare a list of class details to pass to the template
         class_details = []
         for class_name in teacher_classes:
             class_info = {
-                'course_name': class_name,
-                'teacher': offered_classes_professors.get(class_name, 'N/A'),
-                'time': offered_classes_times.get(class_name, 'N/A'),
-                'enrollment': f"{offered_classes_enrollment.get(class_name, 0)} / {offered_classes_capacity.get(class_name, 0)}"
+                "course_name": class_name,
+                "teacher": offered_classes_professors.get(class_name, "N/A"),
+                "time": offered_classes_times.get(class_name, "N/A"),
+                "enrollment": f"{offered_classes_enrollment.get(class_name, 0)} / {offered_classes_capacity.get(class_name, 0)}",
             }
             class_details.append(class_info)
 
-        return render_template('teacher.html', class_details=class_details)
+        return render_template("teacher.html", class_details=class_details)
 
-    return redirect(url_for('login'))  # Redirect if user is not logged in or not a teacher
-
+    return redirect(
+        url_for("login")
+    )  # Redirect if user is not logged in or not a teacher
 
 
 @app.route("/updateClasses/<string:action>", methods=["GET", "POST"])
 def updateClasses(action):
     if request.method == "GET":
-        return jsonify({
-            "classes": current_user.classes,
-            "class_professor": current_user.class_professor,
-            "class_time": current_user.class_time,
-            "class_status": current_user.class_status,
-        })
+        return jsonify(
+            {
+                "classes": current_user.classes,
+                "class_professor": current_user.class_professor,
+                "class_time": current_user.class_time,
+                "class_status": current_user.class_status,
+            }
+        )
 
     # else the method is "POST"
 
-    data = request.get_json()  # expecting data as a JSON object, e.g., {"class_name": "CSE 108", "grade": 100}
+    data = (
+        request.get_json()
+    )  # expecting data as a JSON object, e.g., {"class_name": "CSE 108", "grade": 100}
     class_name = data["class_name"]
-    grade = data.get("grade", 100)  
+    grade = data.get("grade", 100)
 
     if action == "add":
-        
+
         if any(cls["class_name"] == class_name for cls in current_user.classes):
             return jsonify({"error": "Already registered for this class"}), 400
-        
+
         if offered_classes_status[class_name] == False:
             return jsonify({"error": "class is full"}), 400
-      
+
         current_user.classes.append({"class_name": class_name, "grade": grade})
         current_user.class_time[class_name] = offered_classes_times[class_name]
-        current_user.class_professor[class_name] = offered_classes_professors[class_name]
-        
+        current_user.class_professor[class_name] = offered_classes_professors[
+            class_name
+        ]
+
         offered_classes_enrollment[class_name] += 1
         current_user.class_status[class_name] = (
             f"{offered_classes_enrollment[class_name]}/{offered_classes_capacity[class_name]}"
         )
 
-       
-        if offered_classes_enrollment[class_name] == offered_classes_capacity[class_name]:
+        if (
+            offered_classes_enrollment[class_name]
+            == offered_classes_capacity[class_name]
+        ):
             offered_classes_status[class_name] = False
 
         db.session.merge(current_user)
         db.session.commit()
 
-        return jsonify({
-            "classes": current_user.classes,
-            "class_professor": current_user.class_professor,
-            "class_time": current_user.class_time,
-            "class_status": current_user.class_status,
-        })
+        return jsonify(
+            {
+                "classes": current_user.classes,
+                "class_professor": current_user.class_professor,
+                "class_time": current_user.class_time,
+                "class_status": current_user.class_status,
+            }
+        )
 
     elif action == "drop":
-        current_user.classes = [cls for cls in current_user.classes if cls["class_name"] != class_name]
+        current_user.classes = [
+            cls for cls in current_user.classes if cls["class_name"] != class_name
+        ]
         del current_user.class_time[class_name]
         del current_user.class_professor[class_name]
         del current_user.class_status[class_name]
         offered_classes_enrollment[class_name] -= 1
 
-        if offered_classes_enrollment[class_name] != offered_classes_capacity[class_name]:
+        if (
+            offered_classes_enrollment[class_name]
+            != offered_classes_capacity[class_name]
+        ):
             offered_classes_status[class_name] = True
 
         db.session.merge(current_user)
         db.session.commit()
 
-        return jsonify({
-            "classes": current_user.classes,
-            "class_professor": current_user.class_professor,
-            "class_time": current_user.class_time,
-            "class_status": current_user.class_status,
-        })
+        return jsonify(
+            {
+                "classes": current_user.classes,
+                "class_professor": current_user.class_professor,
+                "class_time": current_user.class_time,
+                "class_status": current_user.class_status,
+            }
+        )
+
 
 # # # dont uncomment this!!
 # @app.route("/add_class_to_teacher")
 # def add_class_to_teacher():
 #     teacher = Users.query.filter_by(username="Juan Meza").first()
-    
+
 #     if teacher and "Math 131" not in teacher.classes:
 #         teacher.classes.append("Math 131")
 #         db.session.commit()  # Save the changes
 #         return "Class added successfully!"
-    
+
 #     return "Class already exists or user not found."
-
-
 
 
 @app.route("/user_table")
 def userTable():
     return render_template("classes.html")
+
 
 @app.route("/enrollment/<string:class_name>")
 def enrollmentUpdate(class_name):
@@ -364,15 +391,18 @@ def enrollmentUpdate(class_name):
     if class_enrollment == offered_classes_capacity[class_name]:
         class_enrollment_string = "FULL"
     else:
-        class_enrollment_string = str(class_enrollment) + "/" + str(offered_classes_capacity[class_name])
-    class_id_format = class_name.strip().replace(" ", "-") # e.g. CSE 108 -> CSE-108
+        class_enrollment_string = (
+            str(class_enrollment) + "/" + str(offered_classes_capacity[class_name])
+        )
+    class_id_format = class_name.strip().replace(" ", "-")  # e.g. CSE 108 -> CSE-108
     return jsonify(
         {
             "class_enrollment": class_enrollment_string,
-            "class_id_format": class_id_format
+            "class_id_format": class_id_format,
         }
     )
-    
+
+
 @app.route("/updateCourses", methods=["GET"])
 def updateCourses():
     formatted_classes = []
@@ -380,52 +410,67 @@ def updateCourses():
     for cls in offered_classes:
         format = cls.strip().replace(" ", "-")
         formatted_classes.append(format)
-        class_enrollment[format] = f"{offered_classes_enrollment[cls]}/{offered_classes_capacity[cls]}"
+        class_enrollment[format] = (
+            f"{offered_classes_enrollment[cls]}/{offered_classes_capacity[cls]}"
+        )
 
-    return jsonify({
-            "classes": formatted_classes,
-            "enrollment": class_enrollment
-        })
+    return jsonify({"classes": formatted_classes, "enrollment": class_enrollment})
+
 
 @app.route("/class_details/<string:class_name>")
 def class_details(class_name):
     students = []
     for user in Users.query.all():
-        
+
         # Ensure user.classes is a list and user is not a teacher
         if isinstance(user.classes, list) and not user.teacher:
             # Find the matching class entry in the user's classes
             matching_class = next(
-                (c for c in user.classes if isinstance(c, dict) and c.get("class_name") == class_name), 
-                None
+                (
+                    c
+                    for c in user.classes
+                    if isinstance(c, dict) and c.get("class_name") == class_name
+                ),
+                None,
             )
-            
+
             if matching_class:
                 grade = matching_class.get("grade", "N/A")
-                students.append({
-                    "name": user.username,
-                    "grade": grade
-                })
+                students.append({"name": user.username, "grade": grade})
             else:
-                print(f"Class '{class_name}' not found in user {user.username}'s classes.")
+                print(
+                    f"Class '{class_name}' not found in user {user.username}'s classes."
+                )
         else:
             print(f"Unexpected structure for user.classes: {user.classes}")
-    
-    return render_template("class_details.html", class_name=class_name, students=students)
+
+    return render_template(
+        "class_details.html", class_name=class_name, students=students
+    )
+
 
 @app.route("/update_grade/<string:class_name>/<string:student_name>", methods=["POST"])
 def update_grade(class_name, student_name):
     try:
         data = request.get_json()
-        new_grade = data.get('new_grade')
+        new_grade = data.get("new_grade")
 
         try:
-            new_grade = float(new_grade)  
+            new_grade = float(new_grade)
             if not (0 <= new_grade <= 100):
-                return jsonify({"success": False, "message": "Invalid grade input. Please enter a number between 0 and 100."})
+                return jsonify(
+                    {
+                        "success": False,
+                        "message": "Invalid grade input. Please enter a number between 0 and 100.",
+                    }
+                )
         except (ValueError, TypeError):
-            return jsonify({"success": False, "message": "Invalid grade input. Please enter a number between 0 and 100."})
-
+            return jsonify(
+                {
+                    "success": False,
+                    "message": "Invalid grade input. Please enter a number between 0 and 100.",
+                }
+            )
 
         user = Users.query.filter_by(username=student_name).first()
 
@@ -436,31 +481,48 @@ def update_grade(class_name, student_name):
             updated = False  # Track if we made any updates
 
             for class_entry in user.classes:
-                if isinstance(class_entry, dict) and class_entry.get("class_name") == class_name:
-                    updated_classes.append({
-                        "class_name": class_entry["class_name"],
-                        "grade": float(new_grade)  
-                    })
+                if (
+                    isinstance(class_entry, dict)
+                    and class_entry.get("class_name") == class_name
+                ):
+                    updated_classes.append(
+                        {
+                            "class_name": class_entry["class_name"],
+                            "grade": float(new_grade),
+                        }
+                    )
                     updated = True
                 else:
                     updated_classes.append(class_entry)
 
             if updated:
-                user.classes = updated_classes 
-                db.session.add(user)  
+                user.classes = updated_classes
+                db.session.add(user)
                 db.session.commit()
 
                 print(f"Updated classes for {student_name}: {user.classes}")
 
-                return jsonify({"success": True, "message": f"Grade for {student_name} in {class_name} updated successfully to {new_grade}."})
+                return jsonify(
+                    {
+                        "success": True,
+                        "message": f"Grade for {student_name} in {class_name} updated successfully to {new_grade}.",
+                    }
+                )
             else:
-                return jsonify({"success": False, "message": f"Class {class_name} not found for {student_name}."})
+                return jsonify(
+                    {
+                        "success": False,
+                        "message": f"Class {class_name} not found for {student_name}.",
+                    }
+                )
 
         return jsonify({"success": False, "message": "Student not found."})
 
     except Exception as e:
         print(f"Error updating grade: {e}")
-        return jsonify({"success": False, "message": "An error occurred while updating the grade."})
+        return jsonify(
+            {"success": False, "message": "An error occurred while updating the grade."}
+        )
 
 
 if __name__ == "__main__":
